@@ -1,7 +1,7 @@
 {
-  "name": "react-native-flextv-mobile-player-radio",
+  "name": "flextv-mobile-player-radio",
   "version": "0.1.0",
-  "description": "radio mode for flextvapp",
+  "description": "radio mode",
   "main": "lib/commonjs/index",
   "module": "lib/module/index",
   "types": "lib/typescript/src/index.d.ts",
@@ -27,7 +27,7 @@
     "!**/.*"
   ],
   "scripts": {
-    "example": "yarn workspace react-native-flextv-mobile-player-radio-example",
+    "example": "yarn workspace flextv-mobile-player-radio-example",
     "test": "jest",
     "typecheck": "tsc --noEmit",
     "lint": "eslint \"**/*.{js,ts,tsx}\"",
@@ -42,14 +42,14 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/flexenm/flextv-mobile-player-radio.git.git"
+    "url": "git+https://github.com/flexenm/flextv-mobile-player-radio.git"
   },
   "author": "jeenoos <jw.lim@flexenm.com> (https://github.com/flexenm)",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/flexenm/flextv-mobile-player-radio.git/issues"
+    "url": "https://github.com/flexenm/flextv-mobile-player-radio/issues"
   },
-  "homepage": "https://github.com/flexenm/flextv-mobile-player-radio.git#readme",
+  "homepage": "https://github.com/flexenm/flextv-mobile-player-radio#readme",
   "publishConfig": {
     "registry": "https://registry.npmjs.org/"
   },

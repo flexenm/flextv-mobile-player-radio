@@ -8,10 +8,10 @@ import com.facebook.react.uimanager.ViewManager
 
 class FlextvMobilePlayerRadioPackage : ReactPackage {
   override fun createNativeModules(reactContext: ReactApplicationContext): List<NativeModule> {
-    return emptyList()
+    return listOf(FlextvMobilePlayerRadioModule(reactContext))
   }
 
   override fun createViewManagers(reactContext: ReactApplicationContext): List<ViewManager<*, *>> {
-    return listOf(FlextvMobilePlayerRadioViewManager())
+    return emptyList()
   }
 }

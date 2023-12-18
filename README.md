@@ -1,21 +1,21 @@
 # flextv-mobile-player-radio
 
-radio mode for flextvapp
+radio mode
 
 ## Installation
 
 ```sh
-npm install https://github.com/flexenm/flextv-mobile-player-radio.git
+npm install flextv-mobile-player-radio
 ```
 
 ## Usage
 
 ```js
-import { FlextvMobilePlayerRadioView } from "flextv-mobile-player-radio";
+import { multiply } from 'flextv-mobile-player-radio';
 
 // ...
 
-<FlextvMobilePlayerRadioView color="tomato" />
+const result = await multiply(3, 7);
 ```
 
 ## Contributing

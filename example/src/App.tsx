@@ -1,12 +1,18 @@
 import * as React from 'react';
 
-import { StyleSheet, View } from 'react-native';
-import { FlextvMobilePlayerRadioView } from 'react-native-flextv-mobile-player-radio';
+import { StyleSheet, View, Text } from 'react-native';
+import { multiply } from 'flextv-mobile-player-radio';
 
 export default function App() {
+  const [result, setResult] = React.useState<number | undefined>();
+
+  React.useEffect(() => {
+    multiply(3, 7).then(setResult);
+  }, []);
+
   return (
     <View style={styles.container}>
-      <FlextvMobilePlayerRadioView color="#32a852" style={styles.box} />
+      <Text>Result: {result}</Text>
     </View>
   );
 }
