@@ -1,9 +1,8 @@
 const path = require('path');
-const pak = require('../package.json');
 
 module.exports = {
   dependencies: {
-    [pak.name]: {
+    'flex-radio-control': {
       root: path.join(__dirname, '..'),
     },
   },
