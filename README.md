@@ -1,17 +1,17 @@
-# react-native-flextv-mobile-player-radio
+# flextv-mobile-player-radio
 
 radio mode for flextvapp
 
 ## Installation
 
 ```sh
-npm install react-native-flextv-mobile-player-radio
+npm install https://github.com/flexenm/flextv-mobile-player-radio.git
 ```
 
 ## Usage
 
 ```js
-import { FlextvMobilePlayerRadioView } from "react-native-flextv-mobile-player-radio";
+import { FlextvMobilePlayerRadioView } from "flextv-mobile-player-radio";
 
 // ...
 
