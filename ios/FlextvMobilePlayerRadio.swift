@@ -16,16 +16,14 @@ class FlextvMobilePlayerRadio: NSObject {
     private let MEDIA_STATE: String = "state"
     private let MEDIA_DICT: Dictionary<String, Any> = [:]
 
-//    init(artworkUrl: String = "", audioInterruptionsObserved: Bool = false) {
-//        super.init()
-//        
-//        self.artworkUrl = artworkUrl
-//        self.audioInterruptionsObserved = audioInterruptionsObserved
-//        
-////        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(audioHardwareRouteChanged:) name:AVAudioSessionRouteChangeNotification object:nil];
-//        NotificationCenter.default.addObserver(self, selector: #selector(audioHardwareRouteChanged(_:)), name: AVAudioSession.routeChangeNotification, object: nil)
-//        UIApplication.shared.beginReceivingRemoteControlEvents()
-//    }
+    override init() {
+        super.init()
+        
+        DispatchQueue.main.async {
+            NotificationCenter.default.addObserver(self, selector: #selector(self.audioHardwareRouteChanged(_:)), name: AVAudioSession.routeChangeNotification, object: nil)
+            UIApplication.shared.beginReceivingRemoteControlEvents()
+        }
+    }
     
     @objc func audioHardwareRouteChanged(_ notification: Notification) {
         let routeChangeReason = (notification.userInfo?[AVAudioSessionRouteChangeReasonKey] as? NSNumber)?.intValue ?? 0
@@ -39,7 +37,7 @@ class FlextvMobilePlayerRadio: NSObject {
     
     }
     
-    @objc func setNowPlaying(details: NSDictionary) {
+    @objc func setNowPlaying(_ details: NSDictionary) {
         Console.d("details : \(details)")
         let artwork = details["artwork"] as? String ?? ""
         let title = details["title"] as? String ?? ""
@@ -60,7 +58,7 @@ class FlextvMobilePlayerRadio: NSObject {
         Console.d("resetNowPlaying!!!")
     }
     
-    @objc func enableControl(controlName: NSString, enabled: Bool, options: NSDictionary) {
+    @objc func enableControl(_ controlName: NSString, enabled: Bool, options: NSDictionary?) {
       Console.d("controlName : \(controlName), enabled : \(enabled), options : \(options)")
         var remoteCenter = MPRemoteCommandCenter.shared()
         
@@ -95,6 +93,7 @@ class FlextvMobilePlayerRadio: NSObject {
     }
     
     func updateArtworkIfNeeded(_ artworkUrl: String?) {
+        Console.d("artworkUrl : \(artworkUrl)")
         if artworkUrl == nil {
             return
         }
@@ -130,33 +129,33 @@ class FlextvMobilePlayerRadio: NSObject {
                 if fileExists {
                     image = UIImage(named: localArtworkUrl)
                 }
-                
-                if image == nil {
+            }
+            
+            if image == nil {
+                return
+            }
+
+            // check whether image is loaded
+            let cgref = image!.cgImage
+            let cim = image!.ciImage
+
+            if (cim == nil && cgref == nil) {
+                return
+            }
+            
+            DispatchQueue.main.async {
+                // Check if URL wasn't changed in the meantime
+                if _artworkUrl != self.artworkUrl {
                     return
                 }
 
-                // check whether image is loaded
-                let cgref = image!.cgImage
-                let cim = image!.ciImage
-
-                if (cim == nil && cgref == nil) {
-                    return
-                }
-                
-                DispatchQueue.main.async {
-                    // Check if URL wasn't changed in the meantime
-                    if _artworkUrl != self.artworkUrl {
-                        return
-                    }
-
-                    let center = MPNowPlayingInfoCenter.default()
-                    let artwork = MPMediaItemArtwork(boundsSize: image!.size, requestHandler: { (size) -> UIImage in
-                        return image!
-                    })
-                    var mediaDict = (center.nowPlayingInfo != nil) ? center.nowPlayingInfo : [:]
-                    mediaDict?[MPMediaItemPropertyArtwork] = artwork
-                    center.nowPlayingInfo = mediaDict
-                }
+                let center = MPNowPlayingInfoCenter.default()
+                let artwork = MPMediaItemArtwork(boundsSize: image!.size, requestHandler: { (size) -> UIImage in
+                    return image!
+                })
+                var mediaDict = (center.nowPlayingInfo != nil) ? center.nowPlayingInfo : [:]
+                mediaDict?[MPMediaItemPropertyArtwork] = artwork
+                center.nowPlayingInfo = mediaDict
             }
         }
     }
