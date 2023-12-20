@@ -57,12 +57,14 @@ class FlextvMobilePlayerRadio: RCTEventEmitter {
         let artwork = details["artwork"] as? String ?? ""
         let title = details["title"] as? String ?? ""
         let artist = details["artist"] as? String ?? ""
+        let isLiveStream = details["isLiveStream"] as? Bool
         
         let center = MPNowPlayingInfoCenter.default()
         var nowPlayingInfo = center.nowPlayingInfo ?? [String: Any]()
         
         nowPlayingInfo[MPMediaItemPropertyTitle] = title
         nowPlayingInfo[MPMediaItemPropertyArtist] = artist
+        nowPlayingInfo[MPNowPlayingInfoPropertyIsLiveStream] = isLiveStream
         
         center.nowPlayingInfo = nowPlayingInfo
         
