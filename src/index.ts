@@ -30,7 +30,7 @@ const NativeFlexRadioControl = NativeModules.FlextvMobilePlayerRadio
       }
     );
 let handlers: { [key in Command]?: (value: any) => void } = {};
-let listenerOfNativeMusicControl: any = null;
+let listenerOfNativeFlexRadioControl: any = null;
 const IS_ANDROID = Platform.OS === 'android';
 type TPlayingInfo = any;
 
@@ -84,12 +84,12 @@ const FlexRadioControl = {
     }
   },
   on: function (actionName: Command, cb: (value: any) => void) {
-    if (!listenerOfNativeMusicControl) {
-      listenerOfNativeMusicControl = (
+    if (!listenerOfNativeFlexRadioControl) {
+      listenerOfNativeFlexRadioControl = (
         IS_ANDROID
           ? DeviceEventEmitter
           : new NativeEventEmitter(NativeFlexRadioControl)
-      ).addListener('RNMusicControlEvent', (event) => {
+      ).addListener('FlexRadioControlEvent', (event) => {
         FlexRadioControl.handleCommand(event.name, event.value);
       });
     }
@@ -97,15 +97,15 @@ const FlexRadioControl = {
   },
   off: function (actionName: Command): void {
     delete handlers[actionName];
-    if (!Object.keys(handlers).length && listenerOfNativeMusicControl) {
-      listenerOfNativeMusicControl.remove();
-      listenerOfNativeMusicControl = null;
+    if (!Object.keys(handlers).length && listenerOfNativeFlexRadioControl) {
+      listenerOfNativeFlexRadioControl.remove();
+      listenerOfNativeFlexRadioControl = null;
     }
   },
   stopControl: function (): void {
-    if (listenerOfNativeMusicControl) {
-      listenerOfNativeMusicControl.remove();
-      listenerOfNativeMusicControl = null;
+    if (listenerOfNativeFlexRadioControl) {
+      listenerOfNativeFlexRadioControl.remove();
+      listenerOfNativeFlexRadioControl = null;
     }
     Object.keys(handlers).map((key) => {
       //@ts-ignore
@@ -119,7 +119,3 @@ const FlexRadioControl = {
 };
 
 export default FlexRadioControl;
-
-// export function multiply(a: number, b: number): Promise<number> {
-//   return FlextvMobilePlayerRadio.multiply(a, b);
-// }

@@ -25,6 +25,11 @@ class FlextvMobilePlayerRadio: NSObject {
         }
     }
     
+    deinit {
+        stop()
+        NotificationCenter.default.removeObserver(self, name: AVAudioSession.routeChangeNotification, object: nil)
+    }
+    
     @objc func audioHardwareRouteChanged(_ notification: Notification) {
         let routeChangeReason = (notification.userInfo?[AVAudioSessionRouteChangeReasonKey] as? NSNumber)?.intValue ?? 0
         if routeChangeReason == AVAudioSession.RouteChangeReason.oldDeviceUnavailable.rawValue {
@@ -56,22 +61,27 @@ class FlextvMobilePlayerRadio: NSObject {
     
     @objc func resetNowPlaying() {
         Console.d("resetNowPlaying!!!")
+        let center = MPNowPlayingInfoCenter.default()
+        center.nowPlayingInfo = nil
+        self.artworkUrl = ""
     }
     
     @objc func enableControl(_ controlName: NSString, enabled: Bool, options: NSDictionary?) {
       Console.d("controlName : \(controlName), enabled : \(enabled), options : \(options)")
-        var remoteCenter = MPRemoteCommandCenter.shared()
+        let remoteCenter = MPRemoteCommandCenter.shared()
         
         if controlName == "play" {              // 재생
             // TODO: - enabled 추가 처리
             remoteCenter.playCommand.addTarget { (_) -> MPRemoteCommandHandlerStatus in
                 // TODO: play action
+                Console.d("playCommand...")
                 return .success
             }
         } else if controlName == "pause" {      // 일시정지
             // TODO: - enabled 추가 처리
             remoteCenter.pauseCommand.addTarget { (_) -> MPRemoteCommandHandlerStatus in
                 // TODO: pause action
+                Console.d("pauseCommand...")
                 return .success
             }
             
@@ -85,11 +95,38 @@ class FlextvMobilePlayerRadio: NSObject {
     }
     
     @objc func stopControl() {
-        
+        stop()
     }
     
-    @objc func observeAudioInterruptions(observe: Bool) {
+    @objc func observeAudioInterruptions(_ observe: Bool) {
+        if (self.audioInterruptionsObserved == observe) {
+            return;
+        }
         
+        if observe {
+            NotificationCenter.default.addObserver(self, selector: #selector(audioInterrupted(_:)), name: AVAudioSession.interruptionNotification, object: nil)
+        } else {
+            NotificationCenter.default.removeObserver(self, name: AVAudioSession.interruptionNotification, object: nil)
+        }
+        self.audioInterruptionsObserved = observe
+    }
+    
+    @objc func audioInterrupted(_ notification: Notification) {
+        if !self.audioInterruptionsObserved {
+                return
+        }
+        
+        let interruptionType = notification.userInfo![AVAudioSessionInterruptionTypeKey] as! AVAudioSession.InterruptionType
+        
+        if interruptionType == .began {                 // 전화 통화 시작 시 발생
+            
+        } else {
+            let interruptionOption = notification.userInfo![AVAudioSessionInterruptionOptionKey] as! AVAudioSession.InterruptionOptions
+            
+            if interruptionOption == .shouldResume {    // 전화 통화 종료 시 발생
+                
+            }
+        }
     }
     
     func updateArtworkIfNeeded(_ artworkUrl: String?) {
@@ -158,5 +195,12 @@ class FlextvMobilePlayerRadio: NSObject {
                 center.nowPlayingInfo = mediaDict
             }
         }
+    }
+    
+    func stop() {
+        var remoteCenter = MPRemoteCommandCenter.shared()
+        resetNowPlaying()
+        observeAudioInterruptions(false)
+        NotificationCenter.default.removeObserver(self, name: AVAudioSession.routeChangeNotification, object: nil)
     }
 }
