@@ -1,6 +1,7 @@
 #import <React/RCTBridgeModule.h>
+#import <React/RCTEventEmitter.h>
 
-@interface RCT_EXTERN_MODULE(FlextvMobilePlayerRadio, NSObject)
+@interface RCT_EXTERN_MODULE(FlextvMobilePlayerRadio, RCTEventEmitter)
 
 RCT_EXTERN_METHOD(updatePlayback:(NSDictionary *) originalDetails)
 RCT_EXTERN_METHOD(setNowPlaying:(NSDictionary *) details)
@@ -13,6 +14,10 @@ RCT_EXTERN_METHOD(observeAudioInterruptions:(BOOL) observe)
 + (BOOL)requiresMainQueueSetup
 {
   return NO;
+}
+
+- (NSArray<NSString *> *)supportedEvents {
+    return @[@"FlexRadioControlEvent"];
 }
 
 @end

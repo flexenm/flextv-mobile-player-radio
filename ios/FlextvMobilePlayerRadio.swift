@@ -1,7 +1,10 @@
 import MediaPlayer
 
 @objc(FlextvMobilePlayerRadio)
-class FlextvMobilePlayerRadio: NSObject {
+class FlextvMobilePlayerRadio: RCTEventEmitter {
+    
+    public static var shared: FlextvMobilePlayerRadio?
+    public let FLEX_RADIO_CONTROL_EVENT_NAME: String = "FlexRadioControlEvent"
     
     private var artworkUrl: String = ""
     private var audioInterruptionsObserved: Bool = false
@@ -16,13 +19,20 @@ class FlextvMobilePlayerRadio: NSObject {
     private let MEDIA_STATE: String = "state"
     private let MEDIA_DICT: Dictionary<String, Any> = [:]
 
+    
     override init() {
         super.init()
+        
+        FlextvMobilePlayerRadio.shared = self
         
         DispatchQueue.main.async {
             NotificationCenter.default.addObserver(self, selector: #selector(self.audioHardwareRouteChanged(_:)), name: AVAudioSession.routeChangeNotification, object: nil)
             UIApplication.shared.beginReceivingRemoteControlEvents()
         }
+    }
+    
+    override func supportedEvents() -> [String]! {
+        return [FLEX_RADIO_CONTROL_EVENT_NAME]
     }
     
     deinit {
@@ -75,6 +85,7 @@ class FlextvMobilePlayerRadio: NSObject {
             remoteCenter.playCommand.addTarget { (_) -> MPRemoteCommandHandlerStatus in
                 // TODO: play action
                 Console.d("playCommand...")
+                self.sendEventName(event: "play")
                 return .success
             }
         } else if controlName == "pause" {      // 일시정지
@@ -82,6 +93,7 @@ class FlextvMobilePlayerRadio: NSObject {
             remoteCenter.pauseCommand.addTarget { (_) -> MPRemoteCommandHandlerStatus in
                 // TODO: pause action
                 Console.d("pauseCommand...")
+                self.sendEventName(event: "pause")
                 return .success
             }
             
@@ -119,12 +131,13 @@ class FlextvMobilePlayerRadio: NSObject {
         let interruptionType = notification.userInfo![AVAudioSessionInterruptionTypeKey] as! AVAudioSession.InterruptionType
         
         if interruptionType == .began {                 // 전화 통화 시작 시 발생
+            sendEventName(event: "pause")
             
         } else {
             let interruptionOption = notification.userInfo![AVAudioSessionInterruptionOptionKey] as! AVAudioSession.InterruptionOptions
             
             if interruptionOption == .shouldResume {    // 전화 통화 종료 시 발생
-                
+                sendEventName(event: "play")
             }
         }
     }
@@ -199,8 +212,13 @@ class FlextvMobilePlayerRadio: NSObject {
     
     func stop() {
         var remoteCenter = MPRemoteCommandCenter.shared()
+        sendEventName(event: "pause")
         resetNowPlaying()
         observeAudioInterruptions(false)
         NotificationCenter.default.removeObserver(self, name: AVAudioSession.routeChangeNotification, object: nil)
+    }
+    
+    private func sendEventName(event: String) {
+        self.sendEvent(withName: FLEX_RADIO_CONTROL_EVENT_NAME, body: ["name" : event])
     }
 }
