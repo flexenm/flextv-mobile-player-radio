@@ -115,16 +115,16 @@ class FlextvMobilePlayerRadio: RCTEventEmitter {
                 return
         }
         
-        let interruptionType = notification.userInfo![AVAudioSessionInterruptionTypeKey] as! AVAudioSession.InterruptionType
-        
-        if interruptionType == .began {                 // 전화 통화 시작 시 발생
-            sendEventName(event: "pause")
-            
-        } else {
-            let interruptionOption = notification.userInfo![AVAudioSessionInterruptionOptionKey] as! AVAudioSession.InterruptionOptions
-            
-            if interruptionOption == .shouldResume {    // 전화 통화 종료 시 발생
-                sendEventName(event: "play")
+        if let interruptionType = notification.userInfo![AVAudioSessionInterruptionTypeKey] as? AVAudioSession.InterruptionType {
+            if interruptionType == .began {                 // 전화 통화 시작 시 발생
+                sendEventName(event: "pause")
+                
+            } else {
+                if let interruptionOption = notification.userInfo![AVAudioSessionInterruptionOptionKey] as? AVAudioSession.InterruptionOptions {
+                    if interruptionOption == .shouldResume {    // 전화 통화 종료 시 발생
+                        sendEventName(event: "play")
+                    }
+                }
             }
         }
     }
