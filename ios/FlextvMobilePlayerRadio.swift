@@ -3,23 +3,14 @@ import MediaPlayer
 @objc(FlextvMobilePlayerRadio)
 class FlextvMobilePlayerRadio: RCTEventEmitter {
     
+    // MARK: - Property
     public static var shared: FlextvMobilePlayerRadio?
     public let FLEX_RADIO_CONTROL_EVENT_NAME: String = "FlexRadioControlEvent"
     
     private var artworkUrl: String = ""
     private var audioInterruptionsObserved: Bool = false
 
-    private let MEDIA_STATE_PLAYING: String = "STATE_PLAYING"
-    private let MEDIA_STATE_PAUSED: String = "STATE_PAUSED"
-    private let MEDIA_STATE_STOPPED: String = "STATE_STOPPED"
-    private let MEDIA_STATE_ERROR: String = "STATE_ERROR"
-    private let MEDIA_STATE_BUFFERING: String = "STATE_BUFFERING"
-    private let MEDIA_STATE_RATING_PERCENTAGE: String = "STATE_RATING_PERCENTAGE"
-    private let MEDIA_SPEED: String = "speed"
-    private let MEDIA_STATE: String = "state"
-    private let MEDIA_DICT: Dictionary<String, Any> = [:]
-
-    
+    // MARK: - override
     override init() {
         super.init()
         
@@ -40,16 +31,9 @@ class FlextvMobilePlayerRadio: RCTEventEmitter {
         NotificationCenter.default.removeObserver(self, name: AVAudioSession.routeChangeNotification, object: nil)
     }
     
-    @objc func audioHardwareRouteChanged(_ notification: Notification) {
-        let routeChangeReason = (notification.userInfo?[AVAudioSessionRouteChangeReasonKey] as? NSNumber)?.intValue ?? 0
-        if routeChangeReason == AVAudioSession.RouteChangeReason.oldDeviceUnavailable.rawValue {
-            //headphones unplugged or bluetooth device disconnected, iOS will pause audio
-            
-        }
-    }
-
+    // MARK: - Bridge Function
     @objc func updatePlayback(originalDetails: NSDictionary) {
-    
+        
     }
     
     @objc func setNowPlaying(_ details: NSDictionary) {
@@ -72,29 +56,21 @@ class FlextvMobilePlayerRadio: RCTEventEmitter {
     }
     
     @objc func resetNowPlaying() {
-        Console.d("resetNowPlaying!!!")
         let center = MPNowPlayingInfoCenter.default()
         center.nowPlayingInfo = nil
         self.artworkUrl = ""
     }
     
     @objc func enableControl(_ controlName: NSString, enabled: Bool, options: NSDictionary?) {
-      Console.d("controlName : \(controlName), enabled : \(enabled), options : \(options)")
         let remoteCenter = MPRemoteCommandCenter.shared()
         
         if controlName == "play" {              // 재생
-            // TODO: - enabled 추가 처리
             remoteCenter.playCommand.addTarget { (_) -> MPRemoteCommandHandlerStatus in
-                // TODO: play action
-                Console.d("playCommand...")
                 self.sendEventName(event: "play")
                 return .success
             }
         } else if controlName == "pause" {      // 일시정지
-            // TODO: - enabled 추가 처리
             remoteCenter.pauseCommand.addTarget { (_) -> MPRemoteCommandHandlerStatus in
-                // TODO: pause action
-                Console.d("pauseCommand...")
                 self.sendEventName(event: "pause")
                 return .success
             }
@@ -125,7 +101,16 @@ class FlextvMobilePlayerRadio: RCTEventEmitter {
         self.audioInterruptionsObserved = observe
     }
     
-    @objc func audioInterrupted(_ notification: Notification) {
+    // MARK: - Selector Function
+    @objc private func audioHardwareRouteChanged(_ notification: Notification) {
+        let routeChangeReason = (notification.userInfo?[AVAudioSessionRouteChangeReasonKey] as? NSNumber)?.intValue ?? 0
+        if routeChangeReason == AVAudioSession.RouteChangeReason.oldDeviceUnavailable.rawValue {
+            //headphones unplugged or bluetooth device disconnected, iOS will pause audio
+            
+        }
+    }
+    
+    @objc private func audioInterrupted(_ notification: Notification) {
         if !self.audioInterruptionsObserved {
                 return
         }
@@ -144,8 +129,8 @@ class FlextvMobilePlayerRadio: RCTEventEmitter {
         }
     }
     
-    func updateArtworkIfNeeded(_ artworkUrl: String?) {
-        Console.d("artworkUrl : \(artworkUrl)")
+    // MARK: - function
+    private func updateArtworkIfNeeded(_ artworkUrl: String?) {
         if artworkUrl == nil {
             return
         }
@@ -212,7 +197,7 @@ class FlextvMobilePlayerRadio: RCTEventEmitter {
         }
     }
     
-    func stop() {
+    private func stop() {
         var remoteCenter = MPRemoteCommandCenter.shared()
         sendEventName(event: "pause")
         resetNowPlaying()
