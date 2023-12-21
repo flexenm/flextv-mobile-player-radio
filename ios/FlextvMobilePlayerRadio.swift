@@ -81,7 +81,13 @@ class FlextvMobilePlayerRadio: RCTEventEmitter {
     }
     
     @objc func enableBackgroundMode(_ enabled: Bool) {
-        
+        do {
+            try AVAudioSession.sharedInstance().setCategory(.playback, mode: .default, options: [.mixWithOthers, .allowBluetooth])
+            try AVAudioSession.sharedInstance().setActive(enabled)
+            
+        } catch {
+            Console.e(error.localizedDescription)
+        }
     }
     
     @objc func stopControl() {
