@@ -32,7 +32,7 @@ class FlextvMobilePlayerRadio: RCTEventEmitter {
     }
     
     // MARK: - Bridge Function
-    @objc func updatePlayback(originalDetails: NSDictionary) {
+    @objc func updatePlayback(_ originalDetails: NSDictionary) {
         
     }
     
@@ -80,7 +80,7 @@ class FlextvMobilePlayerRadio: RCTEventEmitter {
         }
     }
     
-    @objc func enableBackgroundMode(enabled: Bool) {
+    @objc func enableBackgroundMode(_ enabled: Bool) {
         
     }
     
