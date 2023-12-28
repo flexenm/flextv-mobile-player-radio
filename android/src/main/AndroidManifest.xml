@@ -1,3 +1,11 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          package="com.flextvmobileplayerradio">
+  package="com.flextvmobileplayerradio">
+
+  <uses-permission android:name="android.permission.WAKE_LOCK" />
+  <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+  <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+
+  <application>
+    <service android:stopWithTask="true" android:name=".RadioServiceWrapper" android:foregroundServiceType="mediaPlayback" />
+  </application>
 </manifest>
