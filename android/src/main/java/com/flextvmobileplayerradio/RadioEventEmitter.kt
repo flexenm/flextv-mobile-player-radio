@@ -72,7 +72,7 @@ class RadioEventEmitter internal constructor(
       }
       context.getJSModule(
         DeviceEventManagerModule.RCTDeviceEventEmitter::class.java
-      ).emit("RNMusicControlEvent", data)
+      ).emit("FlexRadioControlEvent", data)
     }
   }
 }
